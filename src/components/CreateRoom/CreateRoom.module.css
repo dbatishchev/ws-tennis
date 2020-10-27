@@ -1,0 +1,13 @@
+.createRoomPage {
+    max-width: 100%;
+    width: 420px;
+    margin: 0 auto;
+}
+
+.createRoomForm {
+    margin-top: 32px;
+}
+
+.btnWrapper {
+    margin-top: 16px;
+}

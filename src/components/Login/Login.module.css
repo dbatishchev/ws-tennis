@@ -1,0 +1,13 @@
+.loginPage {
+    max-width: 100%;
+    width: 420px;
+    margin: 0 auto;
+}
+
+.loginForm {
+    margin-top: 32px;
+}
+
+.btnWrapper {
+    margin-top: 16px;
+}

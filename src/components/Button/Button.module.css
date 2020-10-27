@@ -1,0 +1,15 @@
+.btn {
+    display: block;
+    background: #2E3542;
+    color: #ffffff;
+    font-size: 15px;
+    text-transform: uppercase;
+    font-weight: bold;
+    height: 50px;
+    width: 100%;
+    text-align: center;
+    border: none;
+    outline: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
