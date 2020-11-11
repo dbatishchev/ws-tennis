@@ -1,24 +1,33 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import {
+  Redirect,
   BrowserRouter as Router,
   Switch,
   Route,
-  Link
-} from "react-router-dom";
+} from 'react-router-dom';
 import './App.module.css';
 import CreateRoom from '../CreateRoom/CreateRoom';
 import Game from '../Game/Game';
 import Login from '../Login/Login';
+import SessionContext from '../../contexts/SessionContext';
 
 export default function App() {
+  const { state: { roomId } } = useContext(SessionContext);
   return (
     <Router>
       <div>
-        {/*<nav>*/}
-        {/*  <Link to="/login">About</Link>*/}
-        {/*  <Link to="/game">Users</Link>*/}
-        {/*</nav>*/}
         <Switch>
+          <Route
+            exact
+            path="/"
+            render={() => {
+              if (!roomId) {
+                return <Redirect to="/login" />;
+              }
+
+              return <Redirect to="/game" />;
+            }}
+          />
           <Route path="/login">
             <Login />
           </Route>

@@ -1,5 +1,3 @@
 import React from 'react';
 
-export default React.createContext({
-  roomId: null,
-});
+export default React.createContext({});

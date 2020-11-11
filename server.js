@@ -1,47 +1,72 @@
-var express = require('express');
-var socket = require('socket.io');
+const autobahn = require('autobahn');
+const WampServer = require('wamp-server');
 
-function listen() {
-  const host = server.address().address;
-  const port = server.address().port;
-  console.log('Example app listening at http://' + host + ':' + port);
-}
-
-const app = express();
-const server = app.listen(process.env.PORT || 3001, listen);
-
-app.use(express.static('public'));
-
-const io = socket(server);
-
-io.sockets.on('connection', function(socket) {
-  console.log('connection', socket.id);
-
-  socket.on('create-room', function(room) {
-    const isRoomExists = Boolean(io.sockets.adapter.rooms[room]);
-
-    if (!isRoomExists) {
-      socket.join(room);
-      socket.emit('post-create-room', { status: 1, description: 'Success' });
-    } else {
-      socket.emit('post-create-room', { status: 2, description: 'Login failed' });
-    }
-  });
-
-  socket.on('login', function(room) {
-    const isRoomExists = Boolean(io.sockets.adapter.rooms[room]);
-
-    if (isRoomExists) {
-      socket.join(room);
-      socket.emit('post-login', { status: 1, description: 'Success' });
-    } else {
-      socket.emit('post-login', { status: 2, description: 'Login failed' });
-    }
-  });
+const server = new WampServer({
+  port: 8000,
+  realms: ['realm1'], // array or string
 });
 
-room = "abc123";
-io.sockets.in(room).emit('message', 'what is going on, party people?');
+const connection = new autobahn.Connection({ url: `ws://127.0.0.1:${server.port}/`, realm: 'realm1' });
+const rooms = {};
 
-io.sockets.in('foobar').emit('message', 'anyone in this room yet?');
+connection.onopen = (session) => {
+  // // 1) subscribe to a topic
+  // function onevent(args) {
+  //   console.log('Event:', args[0]);
+  // }
+  // session.subscribe('com.myapp.hello', onevent);
 
+  // // 2) publish an event
+  // session.publish('com.myapp.hello', ['Hello, world!']);
+
+  // 3) register a procedure for remoting
+
+  // todo subscriptions
+  // https://github.com/crossbario/autobahn-js/blob/master/doc/reference.md
+
+  session.register('login', ([roomId]) => {
+    const isRoomExists = Boolean(rooms[roomId]);
+
+    if (!isRoomExists) {
+      return {
+        status: 'error',
+        error: 'Room does not exist',
+        content: null,
+      };
+    }
+
+    rooms[roomId].players += 1;
+
+    connection.session.publish(`com.tennis.${roomId}.status.change`, ['Hello, world!']);
+
+    return {
+      status: 'success',
+      error: null,
+      content: roomId,
+    };
+  });
+
+  session.register('create-room', ([roomId]) => {
+    const isRoomExists = Boolean(rooms[roomId]);
+
+    if (isRoomExists) {
+      return {
+        status: 'error',
+        error: 'Room does not exist',
+        content: null,
+      };
+    }
+
+    rooms[roomId] = {
+      players: 1,
+    };
+
+    return {
+      status: 'success',
+      error: null,
+      content: roomId,
+    };
+  });
+};
+
+connection.open();

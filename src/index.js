@@ -3,12 +3,19 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './components/App/App';
 import * as serviceWorker from './serviceWorker';
+import { SessionProvider } from './store/SessionStore';
+import WSConnection from './containers/WSConnection';
+// import GameContainer from './containers/GameContainer';
 
 ReactDOM.render(
   <React.StrictMode>
-    <App />
+    <SessionProvider>
+      <WSConnection>
+        <App />
+      </WSConnection>
+    </SessionProvider>
   </React.StrictMode>,
-  document.getElementById('root')
+  document.getElementById('root'),
 );
 
 // If you want your app to work offline and load faster, you can change
